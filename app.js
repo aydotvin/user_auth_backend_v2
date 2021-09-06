@@ -2,10 +2,10 @@ require("dotenv").config();
 global.lang = require("./src/lang/default");
 
 const options = {
-	logDirectory: "./log",
-	fileNamePattern: "<DATE>.log",
-	dateFormat: "DD-MM-YYYY",
-	timestampFormat: "YYYY-MM-DD HH:mm:ss.SSS",
+  logDirectory: "./log",
+  fileNamePattern: "<DATE>.log",
+  dateFormat: "DD-MM-YYYY",
+  timestampFormat: "YYYY-MM-DD HH:mm:ss.SSS",
 };
 global.log = require("simple-node-logger").createRollingFileLogger(options);
 log.setLevel("trace");
@@ -19,22 +19,25 @@ app.disable("x-powered-by");
 //	EXPRESS INITIALISATION END
 
 //	DB CONNECTION START
-const mysql = require("mysql");
+const mysql = require("mysql2");
 global.db = mysql.createConnection({
-	host: process.env.DB_HOST,
-	user: process.env.DB_USER,
-	password: process.env.DB_PASSWORD,
-	database: process.env.DB_NAME,
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 db.connect((err) => {
-	if (err) {
-		console.log("DB connection failed.");
-		console.log(err);
-	} else {
-		log.info("DB connected.");
-	}
+  if (err) {
+    console.log("DB connection failed.");
+    console.log(err);
+  } else {
+    log.info("DB connected.");
+  }
 });
 //	DB CONNECTION END
+
+//  SEQUELIZE IMPORT
+const dbs = require("./models");
 
 //	IMPORTING ROUTES START
 const authRoutes = require("./src/route/auth");
@@ -49,10 +52,12 @@ app.use(express.urlencoded({ extended: true })); //	For "Content-Type: applicati
 app.use("/auth", authRoutes);
 
 app.get("/", (req, res) => {
-	return res.status(200).json({ msg: "lel wut" });
+  return res.status(200).json({ msg: "lel wut" });
 });
 
 const port = process.env.PORT || 42069;
-app.listen(port, () => {
-	console.log(`Listening at http://localhost:${port}`);
+dbs.sequelize.sync({ alter: true }).then((req) => {
+  app.listen(port, () => {
+    console.log(`App running at http://localhost:${port}`);
+  });
 });

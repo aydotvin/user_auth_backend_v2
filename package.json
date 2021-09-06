@@ -14,7 +14,9 @@
 		"dotenv": "^9.0.0",
 		"express": "^4.17.1",
 		"jsonwebtoken": "^8.5.1",
-		"mysql": "^2.18.1",
+		"mysql2": "^2.3.0",
+		"sequelize": "^6.6.5",
+		"sequelize-cli": "^6.2.0",
 		"simple-node-logger": "^18.12.24"
 	},
 	"devDependencies": {
