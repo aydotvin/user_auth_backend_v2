@@ -55,6 +55,8 @@ exports.validator = (config = {}, data = {}) => {
 };
 
 exports.getResolveObjectOfSql = (result, type) => {
+  log.debug(result);
+  log.debug("result");
   let finalResult = {};
   switch (type) {
     case "select":
@@ -70,15 +72,54 @@ exports.getResolveObjectOfSql = (result, type) => {
     default:
       break;
   }
+  log.debug(finalResult);
+  log.debug("finalResult");
   return finalResult;
 };
 
 exports.getRejectObjectOfSql = (error) => {
-  return {
-    sqlCode: error.original.code,
-    sqlErrorNo: error.original.errno,
-    sqlMessage: error.original.sqlMessage,
-  };
+  let returnValue = {};
+  let fields = {};
+  switch (error.name) {
+    case "SequelizeDatabaseError":
+      returnValue = {
+        sqlCode: error.original.code,
+        sqlErrorNo: error.original.errno,
+        sqlMessage: error.original.sqlMessage,
+      };
+      break;
+    case "SequelizeValidationError":
+      error.errors.forEach((field) => {
+        fields[field.path] = {
+          value: field.value,
+          type: field.type,
+          message: field.message,
+        };
+      });
+      returnValue = {
+        sqlCode: "VALIDATION_FAIL",
+        sqlErrorNo: "",
+        sqlMessage: fields,
+      };
+      break;
+    case "SequelizeUniqueConstraintError":
+      error.errors.forEach((field) => {
+        fields[field.path] = {
+          value: field.value,
+          type: field.type,
+          message: field.message,
+        };
+      });
+      returnValue = {
+        sqlCode: "ER_DUP_ENTRY",
+        sqlErrorNo: "",
+        sqlMessage: fields,
+      };
+      break;
+    default:
+      break;
+  }
+  return returnValue;
 };
 
 exports.getResponseObject = (response) => {

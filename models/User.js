@@ -1,4 +1,7 @@
-module.exports = (sequelize, DataTypes)=>{
+const Sequelize = require("sequelize");
+
+module.exports = (sequelize, DataTypes) => {
+  log.debug(sequelize.fn("NOW"));
   return sequelize.define(
     "User",
     {
@@ -29,6 +32,7 @@ module.exports = (sequelize, DataTypes)=>{
       date_created: {
         type: DataTypes.DATE,
         allowNull: false,
+        defaultValue: sequelize.fn("NOW"),
       },
       last_modified: {
         type: DataTypes.DATE,
@@ -36,7 +40,7 @@ module.exports = (sequelize, DataTypes)=>{
     },
     {
       tableName: "users",
-      timestamps: false
+      timestamps: false,
     }
   );
-}
+};

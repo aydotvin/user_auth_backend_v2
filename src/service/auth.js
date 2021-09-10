@@ -22,7 +22,6 @@ exports.userSignup = (data = {}) => {
             return authModel.userSignup(data);
           })
           .then((response) => {
-            log.debug(response);
             resolve({
               reason: "USER_ADDED",
               data: {},
@@ -33,6 +32,7 @@ exports.userSignup = (data = {}) => {
               reason: error.sqlCode,
               data: {
                 code: error.sqlErrorNo,
+                data: error.sqlMessage,
               },
             });
           });

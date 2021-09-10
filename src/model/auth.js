@@ -65,11 +65,11 @@ exports.userSignup = (data = {}) => {
       role,
       date_created: new Date().getTime(),
     })
-      .catch((err) => {
-        reject(err);
-      })
       .then((res) => {
-        resolve(res);
+        resolve(commonModel.getResolveObjectOfSql(res, "insert"));
+      })
+      .catch((err) => {
+        reject(commonModel.getRejectObjectOfSql(err));
       });
   });
 };
